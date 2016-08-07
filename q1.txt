@@ -1,0 +1,102 @@
+Banks:
+    PRIMARY KEY ("BankName", "City") - Because it will each bank is supposed to
+    only be in a city once and hence this will be unique and minimal. It also
+    means that these values cant be 'null' which means that the bank will always
+    be uniquely identifiable.
+
+    NoAccounts - I have a check so that you can't have a negative number of accounts.
+    Zero is allowed because it means that when a bank is first created this value
+    can be zero.
+
+    Security- There doesnt seem to be much of a convention on this field. So no
+    other constraints are needed.
+
+Robberies:
+    PRIMARY KEY ("BankName", "City", "Date") - I was torn between creating a 
+    unique id for a robbery to allow the same bank being robbed multiple times
+    on the same day with this primary key. I decided to use this as the primary
+    key so that the 'Accomplices' foreign key can map to a particular robbery.
+    i.e. uniquely identifiable by the bank, city and date. This means that these
+    values cannot be null and hence easily used for foreign keys
+    
+    FOREIGN KEY ("BankName", "City") REFERENCES "Banks" ("BankName", "City") ON DELETE RESTRICT -
+    This is the mapping back to unique bank, so I need the fields that are in the
+    primary key of the bank. I also have delete restrict, so that you can't delete
+    a bank, until you delete the records of the robberies of that bank. This could
+    be useful for historical purposes. Personally I would have a field that is 
+    one of two options, "active" or "inactive" to indicate whether the bank still
+    exists or not.
+
+    Amount - This has to be greater than or equal to zero. I will accept 0 as a
+    value because the robbery may have failed and no money was actually stolen.
+
+Plans:
+    PlanId - I decided to include a plan ID. Mainly because I think that it is 
+    easily likely for the same bank to have the same number of people wanting to
+    rob it on the same day. So I simply added an ID to it and made it the primary
+    key.
+
+    FOREIGN KEY ("BankName", "City") REFERENCES "Banks"  ("BankName", "City") ON DELETE CASCADE-
+    Chose to have the Banks referened be ones that exist in the "Banks" table. 
+    This means that a bank must exist for plans to be made. The fields are also
+    not null, so you can't plan an attack on an unknown bank. Although this is 
+    is possible, by the time the ploice find out they need to have an idea as to
+    where it is before they can make it an official 'plan' which I think makes sense.
+    Cascade is used so that if the bank no longer exists, neither do the plans i.e. 
+    It doesn't make sense for a plan to exist without a bank.
+
+Robbers:
+    RobberId - Used a unique id because the only other fields that can be chosen from
+    can easily be duplicates, so a new field was required.
+
+Skills:
+    SkillId used as a reference and so it makes sense that the ID is the primary key 
+    as adding 'Description' to this would no longer be minimal.  Although I don't 
+    think duplicate descriptions should be added either so I have a unique constraint.
+
+HasSkills:
+    REFERENCES "Robbers" ("RobberId") ON DELETE CASCADE -
+    This foreign key so that a skill must be mapped to an existing robber. Delete 
+    cascade so that if the robber is deleted, so are his skills. This is because
+    we dont want skills mapped to robbers that dont exist.
+
+    REFERENCES "Skills" ("SkillId") ON DELETE RESTRICT -
+    Explained in the 'skills' problem on the hand out. Want finite set and skills 
+    to not be misspelled.
+
+    PRIMARY KEY ("RobberId", "SkillId") - This insures that each robber can only 
+    have one of each skill to avoid duplicates and hence makes it a good 
+    option for a primary key.
+
+    CHECK ("Preference" >= 1) - This is so that you cant enter a skill that is 
+    the zeroth preferred or negative. The instructions say that the most preferred
+    is 1.
+
+HasAccounts:
+    REFERENCES "Robbers" ("RobberId") ON DELETE CASCADE -
+    This foreign key so that a skill must be mapped to an existing robber. Delete 
+    cascade so that if the robber is deleted, so are his skills. This is because
+    we dont want skills mapped to robbers that dont exist.
+
+    PRIMARY KEY ("RobberId", "BankName", "City") -
+    This is so that you can map a particular robber to a particular bank inwhich
+    he has accounts and uniquely identify by those parameters.
+
+    FOREIGN KEY ("BankName", "City") REFERENCES "Banks" ("BankName", "City") ON DELETE CASCADE -
+    Chose to have the Banks referened be ones that exist in the "Banks" table. 
+
+Accomplices:
+    REFERENCES "Robbers" ("RobberId") ON DELETE CASCADE -
+    The way the logic works with this table is you want a particular robber mapped
+    to a particular robbery. So that means that the robber must exist in the robbers
+    table and if the robber is deleted from the robbers table, he still could have been
+    an accomplice so I have decided to restrict that deletion.
+
+    PRIMARY KEY ("RobberId", "BankName", "City", "RobberyDate") -
+    This is chosen as the primary key so that you can map a robber to a particular
+    robbery as will be shown in the foreign key.
+
+    FOREIGN KEY ("BankName", "City", "RobberyDate") REFERENCES "Robberies" ("BankName", "City", "Date") ON DELETE CASCADE -
+    This mapps back to a particular robbery so that we can make sure that an accomplice
+    has been associated with a robbery that exists. i.e. you cant participate in a 
+    robbery that has never happened.
