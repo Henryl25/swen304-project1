@@ -29,7 +29,7 @@ CREATE TABLE "Plans" (
 
 CREATE TABLE "Robbers" (
     "RobberId" SERIAL PRIMARY KEY,
-    "Nickname" char(64),
+    "NickName" char(64),
     "Age" integer
         CHECK ("Age" > 0 AND "Age" < 120),
     "NoYears" integer
