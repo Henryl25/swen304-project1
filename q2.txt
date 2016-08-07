@@ -1,0 +1,11 @@
+Banks:
+    \copy "Banks" from 'banks_16.data';
+
+Plans:
+    \copy "Plans"("BankName", "City", "PlannedDate", "NoRobbers") from 'Data/plans_16.data';
+
+Robberies:
+    \copy "Robberies"("BankName", "City", "Date", "Amount") from 'Data/robberies_16.data';
+
+Robbers:
+    \copy "Robbers"("NickName", "Age", "NoYears") from 'Data/robbers_16.data';
