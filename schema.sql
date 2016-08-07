@@ -1,10 +1,3 @@
-/* TODO: 
--On deletes
--Field Validation regexes
--Primary key for accomplices
-    should i use robbery id to refer to a particular robbery
-    can the same place be robbed twice on the same day buy the same guy
-*/
 CREATE TABLE "Banks" (
     "BankName" char(64) NOT NULL,
     "City" char(64) NOT NULL,
@@ -12,27 +5,27 @@ CREATE TABLE "Banks" (
         CHECK ("NoAccounts" >= 0),
     "Security" char(64),
     PRIMARY KEY ("BankName", "City")
-)
+);
 
 CREATE TABLE "Robberies" (
-    "RobberyId" SERIAL PRIMARY KEY,
     "BankName" char(64) NOT NULL,
     "City" char(64) NOT NULL,
-    "Date" date,
-    "Amount" decimal 
+    "Date" date NOT NULL,
+    "Amount" decimal
         CHECK ("Amount" >= 0),
-    FOREIGN KEY ("BankName", "City") REFERENCES "Banks" ("BankName", "City")
-)
+    PRIMARY KEY ("BankName", "City", "Date"),
+    FOREIGN KEY ("BankName", "City") REFERENCES "Banks" ("BankName", "City") ON DELETE RESTRICT
+);
 
 CREATE TABLE "Plans" (
     "PlanId" SERIAL PRIMARY KEY,
     "BankName" char(64) NOT NULL,
     "City" char(64) NOT NULL,
     "NoRobbers" integer
-        CHECK ("NoRobbers" >= 0),
+        CHECK ("NoRobbers" >= 1),
     "PlannedDate" date,
-    FOREIGN KEY ("BankName", "City") REFERENCES "Banks"  ("BankName", "City")
-)
+    FOREIGN KEY ("BankName", "City") REFERENCES "Banks"  ("BankName", "City") ON DELETE RESTRICT
+);
 
 CREATE TABLE "Robbers" (
     "RobberId" SERIAL PRIMARY KEY,
@@ -41,44 +34,43 @@ CREATE TABLE "Robbers" (
         CHECK ("Age" > 0 AND "Age" < 120),
     "NoYears" integer
         CHECK ("NoYears" >= 0 AND "NoYears"< "Age")
-)
+);
 
 CREATE TABLE "Skills" (
     "SkillId" SERIAL PRIMARY KEY,
     "Description" char(256)
-)
+);
 
 CREATE TABLE "HasSkills" (
     "RobberId" integer NOT NULL
-        REFERENCES "Robbers" ("RobberId"),
+        REFERENCES "Robbers" ("RobberId") ON DELETE CASCADE,
     "SkillId" integer NOT NULL
-        REFERENCES "Skills" ("SkillId"),
+        REFERENCES "Skills" ("SkillId") ON DELETE RESTRICT,
     "Preference" integer
         CHECK ("Preference" >= 1),
     "Grade" char(2)
         CONSTRAINT valid_grade 
             CHECK ("Grade" IN ('A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', NULL)),
     PRIMARY KEY ("RobberId", "SkillId")
-)
+);
 
 CREATE TABLE "HasAccounts" (
     "RobberId" integer NOT NULL
-        REFERENCES "Robbers" ("RobberId"),
-    "BankName" integer NOT NULL,
+        REFERENCES "Robbers" ("RobberId") ON DELETE CASCADE,
+    "BankName" char(64) NOT NULL,
     "City" char(64) NOT NULL,
     PRIMARY KEY ("RobberId", "BankName", "City"),
-    FOREIGN KEY ("BankName", "City") REFERENCES "Banks" ("BankName", "City")
-)
+    FOREIGN KEY ("BankName", "City") REFERENCES "Banks" ("BankName", "City") ON DELETE CASCADE
+);
 
 CREATE TABLE "Accomplices" (
     "RobberId" integer
-        REFERENCES "Robbers" ("RobberId"),
-    "BankName" integer NOT NULL,
+        REFERENCES "Robbers" ("RobberId") ON DELETE CASCADE,
+    "BankName" char(64) NOT NULL,
     "City" char(64) NOT NULL,
     "RobberyDate" date NOT NULL,
     "Share" decimal
-        CHECK ("Share" > 0),
-    PRIMARY KEY ("RobberId", "BankName", "City", "RobberyDate") --cant rob the same bank twice on the same day
-    FOREIGN KEY ("BankName", "City") REFERENCES "Banks" ("BankName", "City")
-)
-
+        CHECK ("Share" >= 0),
+    PRIMARY KEY ("RobberId", "BankName", "City", "RobberyDate"),
+    FOREIGN KEY ("BankName", "City", "RobberyDate") REFERENCES "Robberies" ("BankName", "City", "Date") ON DELETE CASCADE
+);
