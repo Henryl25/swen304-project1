@@ -8,9 +8,9 @@ CREATE TABLE "Banks" (
 );
 
 CREATE TABLE "Robberies" (
-    "BankName" char(64) NOT NULL,
-    "City" char(64) NOT NULL,
-    "Date" date NOT NULL,
+    "BankName" char(64),
+    "City" char(64),
+    "Date" date,
     "Amount" decimal
         CHECK ("Amount" >= 0),
     PRIMARY KEY ("BankName", "City", "Date"),
@@ -24,7 +24,7 @@ CREATE TABLE "Plans" (
     "NoRobbers" integer
         CHECK ("NoRobbers" >= 1),
     "PlannedDate" date,
-    FOREIGN KEY ("BankName", "City") REFERENCES "Banks"  ("BankName", "City") ON DELETE RESTRICT
+    FOREIGN KEY ("BankName", "City") REFERENCES "Banks"  ("BankName", "City") ON DELETE CASCADE
 );
 
 CREATE TABLE "Robbers" (
@@ -38,7 +38,7 @@ CREATE TABLE "Robbers" (
 
 CREATE TABLE "Skills" (
     "SkillId" SERIAL PRIMARY KEY,
-    "Description" char(256)
+    "Description" char(256) UNIQUE
 );
 
 CREATE TABLE "HasSkills" (
@@ -65,10 +65,10 @@ CREATE TABLE "HasAccounts" (
 
 CREATE TABLE "Accomplices" (
     "RobberId" integer
-        REFERENCES "Robbers" ("RobberId") ON DELETE CASCADE,
-    "BankName" char(64) NOT NULL,
-    "City" char(64) NOT NULL,
-    "RobberyDate" date NOT NULL,
+        REFERENCES "Robbers" ("RobberId") ON DELETE RESTRICT,
+    "BankName" char(64),
+    "City" char(64),
+    "RobberyDate" date,
     "Share" decimal
         CHECK ("Share" >= 0),
     PRIMARY KEY ("RobberId", "BankName", "City", "RobberyDate"),
