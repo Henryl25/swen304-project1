@@ -1,0 +1,126 @@
+1.
+a)
+SQL:
+    insert into "Banks" Values ('Loanshark Bank', 'Evanston', 100, 'very good');
+Feedback:
+    ERROR:  duplicate key value violates unique constraint "Banks_pkey"
+    DETAIL:  Key ("BankName", "City")=(Loanshark Bank, Evanston) already exists.
+
+b)
+SQL:
+    insert into "Banks" Values ('EasyLoan Bank', 'Evanston', -5, 'excellent');
+Feedback:
+    ERROR:  new row for relation "Banks" violates check constraint "positive_or_zero_accounts"
+    DETAIL:  Failing row contains (EasyLoan Bank, Evanston, -5, excellent).
+
+c)
+SQL:
+     insert into "Banks" Values ('EasyLoan Bank', 'Evanston', 100, 'poor');
+Feedback:
+     INSERT 0 1
+
+2.
+a)
+SQL:
+    insert into "Skills" values (20, 'Guarding');
+Feedback:
+    ERROR:  duplicate key value violates unique constraint "Skills_Description_key"
+    DETAIL:  Key ("Description")=(Guarding) already exists.
+
+3.
+a)
+SQL:
+    insert into "Robbers" values (1, 'Shotgun', 70, 0);
+Feedback:
+    ERROR:  duplicate key value violates unique constraint "Robbers_pkey"
+    DETAIL:  Key ("RobberId")=(1) already exists.
+
+b)
+SQL:
+    insert into "Robbers" values (333, 'Jail Mouse', 25, 35);
+Feedback:
+    ERROR:  new row for relation "Robbers" violates check constraint "valid_prison_time"
+    DETAIL:  Failing row contains (333, Jail Mouse, 25, 35).
+
+4.
+a)
+SQL:
+    insert into "HasSkills" values (333, 1, 1, 'B-');
+Feedback:
+    ERROR:  insert or update on table "HasSkills" violates foreign key constraint "HasSkills_RobberId_fkey"
+    DETAIL:  Key (RobberId)=(333) is not present in table "Robbers".
+Note:
+    Because of failing before this obviously cannot be added. Cant be in prison longer than being
+    alive
+
+b)
+SQL:
+    insert into "HasSkills" values (3, 20, 3, 'B+');
+Feedback:
+ERROR:  insert or update on table "HasSkills" violates foreign key constraint "HasSkills_SkillId_fkey"
+DETAIL:  Key (SkillId)=(20) is not present in table "Skills".
+Note:
+    Because of the unique constraint on skill descriptions, the guarding skill was not added and
+    hence this cannot be added
+
+c)
+SQL:
+    insert into "HasSkills" values (1, 9, 1, 'A+');
+Feedback:
+    ERROR:  duplicate key value violates unique constraint "HasSkills_pkey"
+    DETAIL:  Key ("RobberId", "SkillId")=(1, 9) already exists.
+
+d)
+SQL:
+    insert into "HasSkills" values (1, 2, 0, 'A');
+Feedback:
+    ERROR:  new row for relation "HasSkills" violates check constraint "valid_preference"
+    DETAIL:  Failing row contains (1, 2, 0, A ).
+
+5.
+a)
+SQL:
+    insert into "Robberies" values ('NXP Bank', 'Chicago', '2009-01-08', 1000);
+FeedBack:
+    ERROR:  duplicate key value violates unique constraint "Robberies_pkey"
+    DETAIL:  Key ("BankName", "City", "Date")=(NXP Bank, Chicago, 2009-01-08) already exists.
+
+6.
+a)
+SQL:
+    delete from "Banks" where "BankName"='PickPocket Bank' and "City"='Evanston' and "NoAccounts"=2000 and "Security"='very good';
+Feedback:
+    ERROR:  update or delete on table "Banks" violates foreign key constraint "Robberies_BankName_fkey" on table "Robberies"
+    DETAIL:  Key (BankName, City)=(PickPocket Bank, Evanston) is still referenced from table "Robberies".
+Note: This is because I intentionally won't allow banks to be deleted while there are still 
+dependancies. This is to avoid accidental deletions of banks and the removing of potentially
+important information.
+
+b)
+SQL:
+    delete from "Banks" where "BankName"='Gun Chase Bank' and "City"='Evanston' and "NoAccounts"=656565 and "Security"='excellent';
+Feedback:
+    ERROR:  update or delete on table "Banks" violates foreign key constraint "Robberies_BankName_fkey" on table "Robberies"
+    DETAIL:  Key (BankName, City)=(Gun Chase Bank, Evanston) is still referenced from table "Robberies".
+
+7.
+a)
+SQL:
+    delete from "Robbers" where "RobberId"=1 and "NickName"='Al Capone' and "Age"=31 and "NoYears"=2;
+Feedback:
+    ERROR:  update or delete on table "Robbers" violates foreign key constraint "Accomplices_RobberId_fkey" on table "Accomplices"
+    DETAIL:  Key (RobberId)=(1) is still referenced from table "Accomplices".
+Note:
+    I decided to restrict this deletion so that the information about who was involved with what robbery
+    in the accomplices table would not be lost if an accidental deletion was made. This helps avoid the
+    issue where you may have made a robber that was not supposed to be added, want to delete it quickly
+    and then accidently delete a robber involved with many robberies and now the data is lost and cant
+    be retrieved.
+
+8.
+a)
+SQL:
+    delete from "Skills" where "SkillId"=1 and "Description"='Driving';
+Feedback:
+    DELETE 0
+
