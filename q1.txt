@@ -90,7 +90,7 @@ Accomplices:
     The way the logic works with this table is you want a particular robber mapped
     to a particular robbery. So that means that the robber must exist in the robbers
     table and if the robber is deleted from the robbers table, he still could have been
-    an accomplice so I have decided to restrict that deletion.
+    an accomplice on that robbery so I have decided to restrict that deletion.
 
     PRIMARY KEY ("RobberId", "BankName", "City", "RobberyDate") -
     This is chosen as the primary key so that you can map a robber to a particular
