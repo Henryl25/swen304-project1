@@ -9,3 +9,64 @@ Robberies:
 
 Robbers:
     \copy "Robbers"("NickName", "Age", "NoYears") from 'Data/robbers_16.data';
+
+Skills:
+    First create a temp table:
+        CREATE TABLE "HasSkillsTemp" (
+            "NickName" char(64) NOT NULL,
+            "Description" char(64) NOT NULL,
+            "Preference" integer NOT NULL,
+            "Grade" char(2) NOT NULL
+        )
+
+    Then insert values into skills table:
+        insert into "Skills" ("Description") select distinct "Description" from "HasSkillsTemp";
+
+HasSkills:
+    Create temp table:
+        CREATE TABLE "HasSkillsTemp" (
+            "NickName" char(64) NOT NULL,
+            "Description" char(64) NOT NULL,
+            "Preference" integer NOT NULL,
+            "Grade" char(2) NOT NULL
+        )
+    Insert with join:
+        insert into "HasSkills" ("RobberId", "SkillId", "Preference", "Grade")
+        select r."RobberId", s."SkillId", hst."Preference", hst."Grade"
+        from "HasSkillsTemp" hst, "Skills" s, "Robbers" r
+        where hst."Description"=s."Description" and hst."NickName"=r."NickName";
+
+HasAccounts:
+    Create temp table:
+        CREATE TABLE "HasAccountsTemp" (
+            "NickName" char(64),
+            "BankName" char(64),
+            "City" char(64)
+        )
+    Insert with join:
+        insert into "HasAccounts" ("BankName", "City", "RobberId") 
+        select hat."BankName", hat."City", r."RobberId" 
+        from "HasAccountsTemp" hat, "Robbers" r 
+        where hat."NickName"=r."NickName";
+
+Accomplices:
+    Create temp table:
+        CREATE TABLE "AccomplicesTemp" (
+            "NickName" char(64),
+            "BankName" char(64),
+            "City" char(64),
+            "Date" date,
+            "Amount" decimal
+        )
+
+    Insert with join:
+    insert into "Accomplices" ("RobberId", "BankName", "City", "RobberyDate", "Share") 
+    select "RobberId", "BankName", "City", "Date", "Amount" 
+    from "AccomplicesTemp" at, "Robbers" r 
+    where at."NickName"=r."NickName";
+
+Clean Up:
+    Drop temp tables:
+    drop table "HasSkillsTemp";
+    drop table "AccomplicesTemp";
+    drop table "HasAccountsTemp";

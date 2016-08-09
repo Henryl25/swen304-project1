@@ -38,7 +38,7 @@ CREATE TABLE "Robbers" (
 
 CREATE TABLE "Skills" (
     "SkillId" SERIAL PRIMARY KEY,
-    "Description" char(256) UNIQUE
+    "Description" char(64) UNIQUE
 );
 
 CREATE TABLE "HasSkills" (
