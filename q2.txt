@@ -17,7 +17,10 @@ Skills:
             "Description" char(64) NOT NULL,
             "Preference" integer NOT NULL,
             "Grade" char(2) NOT NULL
-        )
+        );
+
+    Copy data;
+        \copy "HasSkillsTemp" from 'Data/hasskills_16.data';
 
     Then insert values into skills table:
         insert into "Skills" ("Description") select distinct "Description" from "HasSkillsTemp";
@@ -29,7 +32,8 @@ HasSkills:
             "Description" char(64) NOT NULL,
             "Preference" integer NOT NULL,
             "Grade" char(2) NOT NULL
-        )
+        );
+
     Insert with join:
         insert into "HasSkills" ("RobberId", "SkillId", "Preference", "Grade")
         select r."RobberId", s."SkillId", hst."Preference", hst."Grade"
@@ -42,7 +46,11 @@ HasAccounts:
             "NickName" char(64),
             "BankName" char(64),
             "City" char(64)
-        )
+        );
+
+    Copy data:
+        \copy "HasAccountsTemp" from 'Data/hasaccounts_16.data';
+
     Insert with join:
         insert into "HasAccounts" ("BankName", "City", "RobberId") 
         select hat."BankName", hat."City", r."RobberId" 
@@ -57,16 +65,19 @@ Accomplices:
             "City" char(64),
             "Date" date,
             "Amount" decimal
-        )
+        );
+    
+    Copy data:
+        \copy "AccomplicesTemp" from 'Data/accomplices_16.data';
 
     Insert with join:
-    insert into "Accomplices" ("RobberId", "BankName", "City", "RobberyDate", "Share") 
-    select "RobberId", "BankName", "City", "Date", "Amount" 
-    from "AccomplicesTemp" at, "Robbers" r 
-    where at."NickName"=r."NickName";
+        insert into "Accomplices" ("RobberId", "BankName", "City", "RobberyDate", "Share") 
+        select "RobberId", "BankName", "City", "Date", "Amount" 
+        from "AccomplicesTemp" at, "Robbers" r 
+        where at."NickName"=r."NickName";
 
 Clean Up:
     Drop temp tables:
-    drop table "HasSkillsTemp";
-    drop table "AccomplicesTemp";
-    drop table "HasAccountsTemp";
+        drop table "HasSkillsTemp";
+        drop table "AccomplicesTemp";
+        drop table "HasAccountsTemp";
