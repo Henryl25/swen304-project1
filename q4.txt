@@ -1,0 +1,161 @@
+1.
+SQL: 
+    select "BankName", "Security"
+    from "Banks"
+    where "City"='Chicago' and "NoAccounts">9000;
+Answer:
+    BankName        | Security
+    ----------------+----------
+    NXP Bank        | very good
+    Loanshark Bank  | excellent
+    Inter-Gang Bank | excellent
+    Penny Pinchers  | weak
+    Dollar Grabbers | very good
+    PickPocket Bank | weak
+    Hidden Treasure | excellent
+
+2.
+SQL:
+    select distinct ha."BankName"
+    from "HasAccounts" ha, "Robbers" r
+    where ha."RobberId"=r."RobberId" and r."NickName"='Calamity Jane';
+Answer:
+    BankName
+    ---------------
+    Bad Bank
+    Dollar Grabbers
+    PickPocket Bank
+
+3.
+SQL:
+    select "BankName", "City"
+    from "Banks"
+    where "City"!='Chicago'
+    order by "NoAccounts";
+Answer:
+    BankName           |  City
+    --------------------+-------------
+    EasyLoan Bank       | Evanston
+    Gun Chase Bank      | Deerfield
+    PickPocket Bank     | Evanston
+    PickPocket Bank     | Deerfield
+    Penny Pinchers      | Evanston
+    Bankrupt Bank       | Evanston
+    Inter-Gang Bank     | Evanston
+    Gun Chase Bank      | Evanston
+    NXP Bank            | Evanston
+    Dollar Grabbers     | Evanston
+    Loanshark Bank      | Deerfield
+    Loanshark Bank      | Evanston
+
+4.
+SQL:
+    select "BankName", "City", "Date"
+    from "Robberies"
+    order by "Date"
+    limit 1;
+Answer:
+     BankName        | City     |    Date
+     ----------------+----------+-----------
+     Loanshark Bank  | Evanston | 2005-02-28
+
+5.
+SQL:
+    select a."RobberId", r."NickName", sum(a."Share") as "Earnings"
+    from "Accomplices" a, "Robbers" r
+    where r."RobberId"=a."RobberId"
+    group by a."RobberId", r."NickName"
+    having sum(a."Share")>30000
+    order by sum(a."Share") desc;
+Answer:
+    RobberId | NickName            | Earnings
+    ----------+---------------------+---------
+    5         | Mimmy The Mau Mau   |    70000
+    15        | Boo Boo Hoff        | 61447.61
+    16        | King Solomon        |  59725.8
+    17        | Bugsy Siegel        |  52601.1
+    3         | Lucky Luchiano      |    42667
+    10        | Bonnie              |    40085
+    1         | Al Capone           |    39486
+    4         | Anastazia           | 39169.62
+    8         | Clyde               |    31800
+
+6.
+SQL:
+    select s."Description", hs."RobberId", r."NickName"
+    from "HasSkills" hs, "Skills" s, "Robbers" r
+    where hs."SkillId"=s."SkillId" and hs."RobberId"=r."RobberId"
+    order by s."Description";
+Answer:
+    Description     | RobberId | NickName
+    ----------------+----------+-------------------
+    Cooking         |       18 | Vito Genovese
+    Driving         |       23 | Lepke Buchalter
+    Driving         |       20 | Longy Zwillman
+    Driving         |       17 | Bugsy Siegel
+    Driving         |        3 | Lucky Luchiano
+    Driving         |        7 | Dutch Schulz
+    Driving         |        5 | Mimmy The Mau Mau
+    Eating          |        6 | Tony Genovese
+    Eating          |       18 | Vito Genovese
+    Explosives      |       24 | Sonny Genovese
+    Explosives      |        2 | Bugsy Malone
+    Guarding        |       17 | Bugsy Siegel
+    Guarding        |        4 | Anastazia
+    Guarding        |       23 | Lepke Buchalter
+    Gun-Shooting    |        9 | Calamity Jane
+    Gun-Shooting    |       21 | Waxey Gordon
+    Lock-Picking    |        8 | Clyde
+    Lock-Picking    |        7 | Dutch Schulz
+    Lock-Picking    |       24 | Sonny Genovese
+    Lock-Picking    |       22 | Greasy Guzik
+    Lock-Picking    |        3 | Lucky Luchiano
+    Money Counting  |       13 | Mickey Cohen
+    Money Counting  |       19 | Mike Genovese
+    Money Counting  |       14 | Kid Cann
+    Planning        |        1 | Al Capone
+    Planning        |        5 | Mimmy The Mau Mau
+    Planning        |        8 | Clyde
+    Planning        |       15 | Boo Boo Hoff
+    Planning        |       16 | King Solomon
+    Preaching       |       10 | Bonnie
+    Preaching       |        1 | Al Capone
+    Preaching       |       22 | Greasy Guzik
+    Safe-Cracking   |        1 | Al Capone
+    Safe-Cracking   |       24 | Sonny Genovese
+    Safe-Cracking   |       12 | Moe Dalitz
+    Safe-Cracking   |       11 | Meyer Lansky
+    Scouting        |        8 | Clyde
+    Scouting        |       18 | Vito Genovese
+    (38 rows)
+
+7.
+SQL:
+    select "RobberId", "NickName", "NoYears"
+    from "Robbers"
+    where "NoYears">3;
+Answer:
+    RobberId | NickName       | NoYears
+    ---------+----------------+--------
+    2        | Bugsy Malone   |      15
+    3        | Lucky Luchiano |      15
+    4        | Anastazia      |      15
+    6        | Tony Genovese  |      16
+    7        | Dutch Schulz   |      31
+    11       | Meyer Lansky   |       6
+    15       | Boo Boo Hoff   |      13
+    16       | King Solomon   |      43
+    17       | Bugsy Siegel   |      13
+    20       | Longy Zwillman |       6
+
+8.
+SQL:
+    select "RobberId", "NickName", "Age" - "NoYears" as "Number of Years Not In Prison"
+    from "Robbers"
+    where "NoYears">"Age"/2;
+Answer:
+    RobberId | NickName      | Number of Years Not In Prison
+    ---------+---------------+------------------------------
+    6        | Tony Genovese | 12
+    16       | King Solomon  | 31
+
